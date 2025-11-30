@@ -1,10 +1,9 @@
-from agenda import database, login_manager
+from agenda import database
 from flask_login import UserMixin
 from datetime import datetime
 
-@login_manager.user_loader
-def load_user(id_usuario):
-    return Usuario.query.get(int(id_usuario))
+
+
 
 class Usuario(database.Model, UserMixin):
     id = database.Column(database.Integer, primary_key=True)

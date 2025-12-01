@@ -4,8 +4,22 @@
 
 {% include 'navbar.html' %} 
 
-<div class=" container-fluid m-5 ms-1"><H1> Bem vindo ao AgendaFácil !</H1></div>
+<div class=" container-fluid mt-5">
+    
+    <H1> Bem vindo ao AgendaFácil !</H1>
 
-<div class="container-fluid m-8"> {% include 'login.html' %} </div>
+<div class="container ms-3 mp-1">    
+    <div class="row">
+  
+        <div class="col-4">
+            {% include 'registre.html' %} 
+          </div>
+          
+        <div class="col-4 ms-5">
+            {% include 'login.html' %} 
+         </div>
 
+    </div>
+</div>
+</div>
 {% endblock %}

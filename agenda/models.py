@@ -15,12 +15,12 @@ class Usuario(database.Model, UserMixin):
     telefone = database.Column(database.String, nullable=False)
 
     
-    def create(nome, email, senha_hash, tipo_user, n_telefone):
+    def create(nome, email, senha_hash, tipo, telefone):
                 usuario = Usuario(nome=nome,
                            email=email, 
                            senha_hash=senha_hash, 
-                           tipo=tipo_user, 
-                           telefone=n_telefone)
+                           tipo=tipo, 
+                           telefone=telefone)
                 return usuario
 
 class HorariosDisponiveis(database.Model):

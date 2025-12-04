@@ -8,7 +8,7 @@ if defined _OLD_CODEPAGE (
     "%SystemRoot%\System32\chcp.com" 65001 > nul
 )
 
-set VIRTUAL_ENV=C:\Users\weder\OneDrive\Desktop\Projetos\PJ_Agenda\venv
+set VIRTUAL_ENV=C:\Users\weder\projetos.dev\pj_agenda\flask-agenda-com-bootstrap\venv
 
 if not defined PROMPT set PROMPT=$P$G
 

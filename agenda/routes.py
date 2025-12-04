@@ -19,24 +19,23 @@ def registre():
     if request.method =="POST":
 
         senha_cript = bcrypt.generate_password_hash(request.form.get("senha_register"))
-        usuario = Usuario(nome=request.form.get("nome_completo"),
+        usuario = Usuario.create(
+                           nome=request.form.get("nome_completo"),
                            email=request.form.get("email_register"), 
                            senha_hash=senha_cript, 
                            tipo=request.form.get("tipo_usuario"), 
                            telefone=request.form.get("num_tel"))
         
-
-        nome_completo = request.form.get("nome_completo")
-        email_register = request.form.get("email_register")
-        senha_register = request.form.get("senha_register")
-        confirmar_senha = request.form.get("senha_register")
-        num_tel = request.form.get("num_tel")
-        tipo_usuario = request.form.get("tipo_usuario")
-
-        
-               
-
-        return render_template("homepage.html")
+        email=request.form.get("email_register")
+        if Usuario.query.filter_by(email=email).first():
+            flash("Esse usuário já existe, mano. Tente outro e-mail", "danger")
+            return redirect(url_for('registre'))
+        else:
+            database.session.add(usuario)
+            database.session.commit()
+            flash("Usuário criado com sucesso", "info")              
+            return render_template("homepage.html")
+    return render_template("homepage.html")
 
 @app.route('/marcar-horario')
 def marcar_horario():

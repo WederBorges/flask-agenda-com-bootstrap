@@ -1,6 +1,9 @@
 
 
 <form method="post" action=" {{url_for('registre')}} ">
+
+    <input type="hidden" name="csrf_token" value=" {{ csrf_token() }}">
+
     <div class=" mt-4"><h5> Não tem conta? Registre-se aqui !</h5></div>
 
   <div class="mb-3">
@@ -31,8 +34,8 @@
     
   <div class="mb-3">
     <select class="form-select " name="tipo_usuario" aria-label="Default select example">
-        <option value="1">Sou cliente</option>
-        <option value="2">Sou Profissional</option>
+        <option value="Cliente">Sou cliente</option>
+        <option value="Profissional">Sou Profissional</option>
     </select>
   </div>
   

@@ -3,6 +3,9 @@
 
 
 <form method="post" action=" {{url_for('home')}} ">
+
+  <input type="hidden" name="csrf_token" value=" {{ csrf_token() }}">
+
   <div class=" mt-4 "><h5> Já tem uma conta? Entre aqui !</h5></div>
 
   

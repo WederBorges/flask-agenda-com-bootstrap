@@ -6,6 +6,13 @@
 
 <div class=" container-fluid mt-5">
     
+    {% with messages = get_flashed_messages(with_categories=True) %}
+        {% if messages %}
+            {% for category, msg in messages %}
+                <div class="alert alert-{{ category }}">{{ msg }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
     <H1> Bem vindo ao AgendaFácil !</H1>
 
 <div class="container ms-3 mp-1">    

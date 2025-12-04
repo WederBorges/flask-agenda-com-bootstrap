@@ -2,20 +2,20 @@
 
 
 
-<form>
+<form method="post" action=" {{url_for('home')}} ">
   <div class=" mt-4 "><h5> Já tem uma conta? Entre aqui !</h5></div>
 
   
   <div class="mb-3">
-    <label for="exampleInputEmail1" class="form-label">E-mail</label>
-    <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+    <label for="inputEmail" class="form-label">E-mail</label>
+    <input type="email" class="form-control" id="inputEmail" aria-describedby="emailHelp" name="email_login">
   </div>
   <div class="mb-3">
     <label for="exampleInputPassword1" class="form-label">Senha</label>
-    <input type="password" class="form-control" id="exampleInputPassword1">
+    <input type="password" class="form-control" id="exampleInputPassword1" name="senha_login">
   </div>
   <div class="mb-3 form-check">
-    <input type="checkbox" class="form-check-input" id="exampleCheck1">
+    <input type="checkbox" class="form-check-input" id="exampleCheck1" name="check_box">
     <label class="form-check-label" for="exampleCheck1">Lembrar de mim</label>
   </div>
   <button type="submit" class="btn btn-primary">Logar</button>

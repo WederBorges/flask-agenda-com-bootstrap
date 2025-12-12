@@ -1,8 +1,11 @@
 {%extends 'base.html'%}
 
-{% block content %}
 
 {% include 'navbar.html' %} 
+
+{% block content %}
+
+
 
 <div class=" container-fluid mt-5">
     
@@ -13,9 +16,12 @@
             {% endfor %}
         {% endif %}
     {% endwith %}
-    <H1> Bem vindo ao AgendaFácil !</H1>
+    
+<div class="container ml-1 mt-4 pb-2 pt-3">
+  <h1>Bem vindo ao AgendaFácil!</h1>
+</div>
 
-<div class="container ms-3 mp-1">    
+<div class="container pb-2  ml-2">    
     <div class="row">
   
         <div class="col-4">
@@ -29,4 +35,5 @@
     </div>
 </div>
 </div>
+
 {% endblock %}

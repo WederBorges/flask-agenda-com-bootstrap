@@ -30,6 +30,7 @@ def registre():
         if Usuario.query.filter_by(email=email).first():
             flash("Esse usuário já existe, mano. Tente outro e-mail", "danger")
             return redirect(url_for('registre'))
+        
         else:
             database.session.add(usuario)
             database.session.commit()
@@ -45,7 +46,7 @@ def marcar_horario():
 def perfil_usuario():
     return render_template("perfil_usuario.html")
 
-@app.route('/perfil_profissional')
+@app.route('/perfil-profissional')
 def perfil_profissional():
     return render_template("perfil_profissional.html")
 

@@ -1,8 +1,10 @@
 
 
-<form method="post" action=" {{url_for('registre')}} ">
+<form method="post" action="{{ url_for('registre') }}">
 
-    <input type="hidden" name="csrf_token" value=" {{ csrf_token() }}">
+<form method="post" action="{{ url_for('registre') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
 
     <div class=" mt-4"><h5> Não tem conta? Registre-se aqui !</h5></div>
 
@@ -14,7 +16,7 @@
   <div class="mb-3">
     <label for="inputEmail" class="form-label">E-mail</label>
     <input type="email" class="form-control" id="inputEmail" aria-describedby="emailHelp" name="email_register">
-    <div id="emailHelp" class="form-text">Nunca compartilharemos seu e-mail com ninguém..</div>
+    <div id="emailHelp" class="form-text">Nunca compartilharemos seu e-mail com ninguém...</div>
   </div>
 
   <div class="mb-3">
@@ -37,9 +39,10 @@
         <option value="Cliente">Sou cliente</option>
         <option value="Profissional">Sou Profissional</option>
     </select>
+      <button type="submit" class="btn btn-primary ml-5 mb-3">Registrar</button>
   </div>
   
-  <button type="submit" class="btn btn-primary">Registrar</button>
+
 
 </form>
 

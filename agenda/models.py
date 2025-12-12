@@ -7,9 +7,9 @@ from flask import request
 
 
 class Usuario(database.Model, UserMixin):
-    id = database.Column(database.Integer, primary_key=True)
-    nome = database.Column(database.String, unique=True,nullable=False)
-    email = database.Column(database.String, nullable=False)
+    id = database.Column(database.Integer,   primary_key=True)
+    nome = database.Column(database.String,  nullable=False)
+    email = database.Column(database.String, unique=True, nullable=False)
     senha_hash = database.Column(database.String, nullable=False)
     tipo = database.Column(database.String, nullable=False)
     telefone = database.Column(database.String, nullable=False)

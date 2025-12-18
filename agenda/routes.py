@@ -1,6 +1,6 @@
 from agenda import app, database, bcrypt, Usuario
 from flask import url_for, render_template, request, redirect, url_for, flash
-from flask_login import login_user, login_required, current_user
+from flask_login import login_user, login_required, current_user, logout_user
 
 
 
@@ -25,7 +25,7 @@ def login():
                else:
                    return redirect(url_for("perfil_profissional"))
             else: 
-                flash("Senha incorreta. Tente Novamente")
+                flash("Senha incorreta. Tente Novamente", "danger")
                 return redirect(url_for("login"))
 
         else:
@@ -59,7 +59,7 @@ def registre():
             return render_template("homepage.html")
     return render_template("homepage.html")
 
-@app.route('/marcar-horario')
+@app.route('/marcar-horario', methods=['GET', 'POST'])
 def marcar_horario():
     return render_template("marcar_horario.html")
 
@@ -70,3 +70,9 @@ def perfil_usuario():
 @app.route('/perfil-profissional')
 def perfil_profissional():
     return render_template("perfil_profissional.html")
+
+@app.route('/sair', methods=["GET", "POST"])
+def logout():
+    logout_user()
+    flash("Você foi deslogado.", "primary")
+    return redirect(url_for('home'))

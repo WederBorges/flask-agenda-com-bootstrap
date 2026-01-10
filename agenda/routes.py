@@ -1,7 +1,11 @@
+from datetime import datetime, timedelta
 from agenda import app, database, bcrypt, Usuario
 from flask import url_for, render_template, request, redirect, url_for, flash
 from flask_login import login_user, login_required, current_user, logout_user
+from agenda.models import HorariosDisponiveis
 
+def _parse_time(hhmm: str):
+    return datetime.strptime(hhmm, "%H:%M").time()
 
 
 @app.route("/", methods=['GET', 'POST'])
@@ -76,3 +80,68 @@ def logout():
     logout_user()
     flash("Você foi deslogado.", "primary")
     return redirect(url_for('home'))
+
+@login_required
+@app.route('/criar-slots', methods=['POST'])
+def criar_slots():
+    
+    #pegar dados do form
+
+    id_profissional = int(request.form['id_profissional'])
+    data = datetime.strptime(request.form["data"], "%Y-%m-%d").date()
+
+    hora_inicio = _parse_time(request.form["hora_inicio"])
+    hora_fim = _parse_time(request.form["hora_fim"])
+    duracao = int(request.form["duracao_min"])
+
+    #validacoes
+
+    dt_inici = datetime.combine(data, hora_inicio)
+    dt_fim = datetime.combine(data, hora_fim)
+
+    if dt_fim <= dt_inici:
+        flash("Hora final maior que hora inicial", "danger")
+        return redirect(url_for("perfil_profissional"))
+    
+    if duracao <= 0:
+        flash("Duração inválida", "danger")
+        return redirect(url_for("perfil_profissional"))
+    
+    if id_profissional != current_user.id:
+        flash("Ação não permitida", "danger")
+        return redirect(url_for("perfil_profissional"))
+    
+    #gerando slots
+
+    atual = dt_inici
+    criados = 0
+
+    while atual + timedelta(minutes=duracao) <= dt_fim:
+        hora_slot = atual.time()
+
+        ja_existe = HorariosDisponiveis.query.filter_by(
+        id_profissional=id_profissional,
+        data=data,
+        hora=hora_slot
+                        ).first()
+
+
+
+        if not ja_existe:
+            slot = HorariosDisponiveis(
+                id_profissional=id_profissional,
+                data=data,
+                hora=hora_slot,
+                ocupado=False
+            )
+
+        database.session.add(slot)
+        criados +=1
+        
+    database.session.commit()
+    flash("Horario criado.")
+    return redirect(url_for("perfil_profissional"))
+    
+@app.route("/criar-slots", methods=["GET"])
+def tela_criar_slots():
+    return render_template("perfil_profissional.html")

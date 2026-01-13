@@ -17,11 +17,12 @@
         {% endif %}
     {% endwith %}
     
+
 <div class="container ml-1 mt-4 pb-2 pt-3">
   <h1>Bem vindo ao AgendaFácil!</h1>
 </div>
 
-<div class="container pb-2  ml-2">    
+<div class="container-fluid pb-2  ml-2">    
     <div class="row">
   
         <div class="col-4">
@@ -31,9 +32,12 @@
         <div class="col-4 ms-5">
             {% include 'login.html' %} 
          </div>
-
+        <div class="col-4 ms-5 pb-2">
+            <img class="imgquadrada" src=" {{ url_for('static', filename='fundo_home.png') }}">
+         </div>
     </div>
 </div>
 </div>
+
 
 {% endblock %}

@@ -1,0 +1,48 @@
+<ul>
+  {% for a in agendamentos %}
+    <li>
+      <button
+        type="button"
+        class="btn btn-sm btn-outline-primary"
+        data-bs-toggle="modal"
+        data-bs-target="#agModal"
+        data-id="{{ a.id }}"
+        data-status="{{ a.status }}"
+        data-cliente="{{ a.cliente.nome }}"
+        data-data="{{ a.slot.data.strftime('%d/%m/%Y') }}"
+        data-hora="{{ a.slot.hora.strftime('%H:%M') }}"
+      >
+        Ver detalhes
+      </button>
+    </li>
+  {% endfor %}
+</ul>
+
+<!-- Modal único -->
+<div class="modal fade" id="agModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Detalhes do agendamento</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+      </div>
+      <div class="modal-body">
+        <p><strong>Cliente:</strong> <span id="mCliente"></span></p>
+        <p><strong>Data/Hora:</strong> <span id="mDataHora"></span></p>
+        <p><strong>Status:</strong> <span id="mStatus"></span></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const modal = document.getElementById('agModal');
+  modal.addEventListener('show.bs.modal', (event) => {
+    const btn = event.relatedTarget;
+
+    document.getElementById('mCliente').textContent = btn.getAttribute('data-cliente');
+    document.getElementById('mDataHora').textContent =
+      btn.getAttribute('data-data') + ' ' + btn.getAttribute('data-hora');
+    document.getElementById('mStatus').textContent = btn.getAttribute('data-status');
+  });
+</script>

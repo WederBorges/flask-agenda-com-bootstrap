@@ -78,12 +78,12 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form action="{{ url_for('marcar_horario') }}" method="POST">
+            <form action="{{ url_for('reservar') }}" method="POST">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <div class="modal-body">
                     <div class="form-group">
                         <label>Profissional</label>
-                        <select class="form-control" id="profissional" name="profissional_id" required>
+                        <select class="form-control" id="profissional" name="id_profissional" required>
                             <option value="" selected disabled>Selecione...</option>
                             {% for prof in profissionais %}
                                 <option value="{{ prof.id }}">{{ prof.nome }}</option>
@@ -92,10 +92,12 @@
                     </div>
                     <div class="form-group">
                         <label>Horários Disponíveis</label>
-                        <select class="form-control" id="horario" name="horario" disabled required>
+                        <select class="form-control" id="horario_id" name="horario_id" disabled required>
                             <option value="">Selecione o profissional primeiro...</option>
                         </select>
                     </div>
+                    <input id="data" name="data" type="date" class="form-control">
+
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
@@ -107,34 +109,61 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const selectProfissional = document.getElementById('profissional');
-    const selectHorario = document.getElementById('horario');
-    const btnConfirmar = document.getElementById('btnConfirmar');
+  const selProf = document.getElementById("profissional");
+  const selHora = document.getElementById("horario_id");
+  const inpData = document.getElementById("data");
+  const btnConfirmar = document.getElementById("btnConfirmar");
 
-    if (selectProfissional) {
-        selectProfissional.addEventListener('change', function() {
-            const profissionalId = this.value;
-            
-            selectHorario.disabled = false;
-            selectHorario.innerHTML = '<option>Buscando horários...</option>';
+  function setHorasPlaceholder(texto) {
+    selHora.innerHTML = "";
+    const opt = document.createElement("option");
+    opt.value = "";
+    opt.textContent = texto;
+    selHora.appendChild(opt);
+    selHora.disabled = true;
+    btnConfirmar.disabled = true; // <- importantíssimo
+  }
 
-            // Certifique-se que esta rota '/obter_horarios/' existe no seu Flask
-            fetch(`/obter_horarios/${profissionalId}`) 
-                .then(response => response.json())
-                .then(data => {
-                    let options = '<option value="" selected disabled>Escolha o horário</option>';
-                    // Adapte 'h.id' e 'h.hora' conforme o JSON que seu Python retorna
-                    data.forEach(h => {
-                        options += `<option value="${h.id}">${h.hora}</option>`;
-                    });
-                    selectHorario.innerHTML = options;
-                    btnConfirmar.disabled = false;
-                })
-                .catch(() => {
-                    selectHorario.innerHTML = '<option>Erro ao carregar</option>';
-                });
-        });
+  async function carregarHorarios() {
+    const idProf = selProf.value;
+    const data = inpData.value;
+
+    if (!idProf) return setHorasPlaceholder("Selecione o profissional primeiro...");
+    if (!data) return setHorasPlaceholder("Selecione uma data...");
+
+    setHorasPlaceholder("Carregando horários...");
+
+    const resp = await fetch(`/api/horarios-disponiveis?id_profissional=${idProf}&data=${data}`);
+    const lista = await resp.json();
+
+    selHora.innerHTML = "";
+
+    if (lista.length === 0) {
+      return setHorasPlaceholder("Sem horários disponíveis nessa data.");
     }
-});
+
+    const opt0 = document.createElement("option");
+    opt0.value = "";
+    opt0.textContent = "Selecione um horário...";
+    selHora.appendChild(opt0);
+
+    for (const item of lista) {
+      const opt = document.createElement("option");
+      opt.value = item.id;
+      opt.textContent = item.hora;
+      selHora.appendChild(opt);
+    }
+
+    selHora.disabled = false;
+    btnConfirmar.disabled = true; // só habilita quando escolher um horário
+  }
+
+  selProf.addEventListener("change", carregarHorarios);
+  inpData.addEventListener("change", carregarHorarios);
+
+  selHora.addEventListener("change", () => {
+    btnConfirmar.disabled = !selHora.value; // habilita quando tem valor
+  });
+
+  setHorasPlaceholder("Selecione o profissional primeiro...");
 </script>

@@ -1,8 +1,10 @@
 from datetime import datetime, timedelta
 from agenda import app, database, bcrypt, Usuario
-from flask import url_for, render_template, request, redirect, url_for, flash
+from flask import url_for, render_template, request, redirect, url_for, flash, jsonify
 from flask_login import login_user, login_required, current_user, logout_user
-from agenda.models import HorariosDisponiveis
+from agenda.models import HorariosDisponiveis, RegistrosAgendamento
+from sqlalchemy import and_
+from sqlalchemy.exc import IntegrityError
 
 def _parse_time(hhmm: str):
     return datetime.strptime(hhmm, "%H:%M").time()
@@ -33,7 +35,7 @@ def login():
                 return redirect(url_for("login"))
 
         else:
-            flash("Essa conta num existe", "danger")
+            flash("Essa conta num existe")
 
 
     return redirect(url_for("home"))
@@ -63,13 +65,13 @@ def registre():
             return render_template("homepage.html")
     return render_template("homepage.html")
 
-@app.route('/marcar-horario', methods=['GET', 'POST'])
-def marcar_horario():
-    return render_template("marcar_horario.html")
 
 @app.route('/perfil-usuario')
+@login_required
 def perfil_usuario():
-    return render_template("perfil_usuario.html")
+    profissionais = Usuario.query.filter_by(tipo="Profissional").order_by(Usuario.nome).all()
+    return render_template("perfil_usuario.html", profissionais=profissionais)
+
 
 @app.route('/perfil-profissional')
 def perfil_profissional():
@@ -81,9 +83,30 @@ def logout():
     flash("Você foi deslogado.", "primary")
     return redirect(url_for('home'))
 
+@app.route('/agenda-atual', methods=['GET'])
 @login_required
+def agenda():
+    if current_user.tipo != "Profissional":
+        return redirect(url_for('home'))
+
+    agendamentos = (
+        RegistrosAgendamento.query
+        .filter(RegistrosAgendamento.id_profissional == current_user.id)
+        .join(HorariosDisponiveis, RegistrosAgendamento.horario_id == HorariosDisponiveis.id)
+        .order_by(HorariosDisponiveis.data.asc(), HorariosDisponiveis.hora.asc())
+        .all()
+    )
+
+    return render_template("agenda_atual.html", agendamentos=agendamentos)
+
+
+
+
 @app.route('/criar-slots', methods=['POST'])
+@login_required
 def criar_slots():
+
+
     
     #pegar dados do form
 
@@ -134,14 +157,76 @@ def criar_slots():
                 hora=hora_slot,
                 ocupado=False
             )
+            database.session.add(slot)
+            criados +=1
+    
+        atual += timedelta(minutes=duracao)
 
-        database.session.add(slot)
-        criados +=1
-        
     database.session.commit()
-    flash("Horario criado.")
+    flash("Horario criado.", 'primary')
     return redirect(url_for("perfil_profissional"))
     
-@app.route("/criar-slots", methods=["GET"])
-def tela_criar_slots():
-    return render_template("perfil_profissional.html")
+
+
+@app.route("/api/horarios-disponiveis")
+@login_required
+def api_horarios_disponiveis():
+    id_prof = int(request.args.get("id_profissional"))
+    data_str = request.args.get("data")
+
+    q = HorariosDisponiveis.query.filter_by(
+        id_profissional = id_prof,
+        ocupado=False
+    )
+
+    if data_str:
+        data = datetime.strptime(data_str, "%Y-%m-%d").date()
+        q = q.filter_by(data=data)
+
+    
+    horarios = q.order_by(HorariosDisponiveis.hora).all()
+
+    return jsonify([
+        {
+            "id": h.id,
+            "data": h.data.strftime("%Y-%m-%d"),
+            "hora": h.hora.strftime("%H:%M"),
+        }
+        for h in horarios
+    ])
+
+@app.route("/reservar", methods=["POST"])
+@login_required
+def reservar():
+    horario_id = int(request.form["horario_id"])
+
+    # tenta ocupar somente se estiver livre
+    atualizado = HorariosDisponiveis.query.filter(
+        and_(HorariosDisponiveis.id == horario_id,
+             HorariosDisponiveis.ocupado == False)
+    ).update({"ocupado": True})
+
+    if atualizado == 0:
+        database.session.rollback()
+        flash("Esse horário acabou de ser reservado. Escolha outro.", "warning")
+        return redirect(url_for("perfil_usuario"))
+
+    # pega o slot para saber o profissional
+    slot = HorariosDisponiveis.query.get(horario_id)
+
+    try:
+        ag = RegistrosAgendamento(
+            id_profissional=slot.id_profissional,
+            cliente_id=current_user.id,
+            horario_id=horario_id,
+            status="PENDENTE"
+        )
+        database.session.add(ag)
+        database.session.commit()
+    except IntegrityError:
+        database.session.rollback()
+        flash("Esse horário já foi reservado. Escolha outro.", "warning")
+        return redirect(url_for("perfil_usuario"))
+
+    flash("Agendamento confirmado!", "success")
+    return redirect(url_for("perfil_usuario"))

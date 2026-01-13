@@ -35,9 +35,9 @@ class HorariosDisponiveis(database.Model):
 
     ocupado = database.Column(database.Boolean, nullable=False, default=False)
 
-__table_args__ = (
-    database.UniqueConstraint('id_profissional', 'data', 'hora', name='uq_prof_data_hora'),
-)
+    __table_args__ = (
+        database.UniqueConstraint('id_profissional', 'data', 'hora', name='uq_prof_data_hora'),
+    )
 
 
 class RegistrosAgendamento(database.Model):
@@ -49,3 +49,7 @@ class RegistrosAgendamento(database.Model):
     cliente_id = database.Column(database.Integer,database.ForeignKey('usuario.id'), nullable=False)
     horario_id = database.Column(database.Integer,database.ForeignKey('horarios_disponiveis.id'), nullable=False, unique=True)
     status = database.Column(database.String, nullable=False, default="PENDENTE")
+
+    slot = database.relationship("HorarioDisponiveis", backref="agendamentos")
+    cliente = database.relationship("Usuario", foreign_keys=[cliente_id])
+    profissional = database.relationship("Usuario", foreign_keys=[id_profissional])

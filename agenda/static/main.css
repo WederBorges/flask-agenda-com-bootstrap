@@ -135,3 +135,19 @@ p {
 }
 
 
+body { padding-top: 70px; }  /* ajuste 56–80 conforme tua navbar */
+
+.imgquadrada{
+    width: 500px;
+    height: 500px;
+    border-radius: 20%;
+}
+
+body {
+    background: linear-gradient(135deg, #0f766e, #134e4a);
+}
+
+body{
+
+    color: aliceblue;
+}
